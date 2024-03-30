@@ -1,13 +1,16 @@
 export module memory;
-import <map>;
-import <vector>;
+
+import<map>;
+import<vector>;
+import<cstdint>;
+
 
 export class Memory {
     std::map<size_t, uint8_t> memory;
 
 public:
-    Memory(vector<u8> vec) {
-        for (int i=0; i < vec.length(); i++) {
+    Memory(std::vector<uint8_t> vec) {
+        for (size_t i=0; i < vec.size(); i++) {
             this->memory[i] = vec[i];
         }
     }
@@ -16,15 +19,21 @@ public:
         return this->memory.at(dest);
     }
 
-    uint16_t load16(size_t dest) const {
-        this->memory.at(dest + 1) << 8 |
-            this-> memory.at(dest);
+    void store8(size_t dest, uint8_t val) {
+        this->memory[dest] = val;
     }
 
     uint32_t load32(size_t dest) const {
-        this->memory.at(dest + 3) << 24 |
+        return this->memory.at(dest + 3) << 24 |
         this->memory.at(dest + 2) << 16 |
         this->memory.at(dest + 1) << 8 |
             this-> memory.at(dest);
     }
-}
+
+    void store32(size_t dest, uint32_t val) {
+        memory[dest + 0] = (val >> 0) & 0xFF;
+        memory[dest + 1] = (val >> 8) & 0xFF;
+        memory[dest + 2] = (val >> 16) & 0xFF;
+        memory[dest + 3] = (val >> 24) & 0xFF;
+    }
+};
