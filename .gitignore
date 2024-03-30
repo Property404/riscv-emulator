@@ -1,0 +1,16 @@
+# Ignore everything by default
+*
+
+# Directories
+!**/
+
+!.gitignore
+!*.sh
+!*.bash
+!Makefile
+!*.cpp
+!*.cc
+!*.h
+!*.hpp
+!*.md
+
