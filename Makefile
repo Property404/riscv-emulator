@@ -5,7 +5,8 @@ LDFLAGS=-std=c++20 -fmodules-ts
 
 OBJECTS=memory.o instruction.o emulator.o
 TEST_OBJECTS=$(OBJECTS) tests/framework.o tests/main.o tests/memory.o
-MODULES=iostream map vector cstdint cstddef cstdlib variant string functional typeinfo new
+MODULES=iostream map vector cstdint cstddef cstdlib variant string functional \
+		typeinfo new stdexcept
 
 all: gcm.cache/mark $(OBJECTS) 
 %.o: %.cpp

@@ -1,20 +1,10 @@
 export module instruction;
 import <variant>;
 import <cstdint>;
+import <stdexcept>;
+
 
 namespace Instruction {
-    /*
-    export std::variant<RTypeInstruction, ITypeInstruction> parse(uint32_t word) {
-        const auto opcode = word & 0b0111_1111;
-        if opcode == 0b0110011  {
-            return reinterpret_cast<RTypeInstruction>(word);
-        } else {
-            throw runtime_error("Couldn't parse instruction");
-        }
-
-    }
-    */
-
     export struct RTypeInstruction {
          uint32_t opcode: 7;
          uint32_t rd: 5;
@@ -31,4 +21,14 @@ namespace Instruction {
          uint32_t rs1: 5;
          uint32_t imm: 12;
     };
+
+    export std::variant<RTypeInstruction, ITypeInstruction> parse(uint32_t word) {
+        const auto opcode = word & 0b0111'1111;
+        if (opcode == 0b0110011)  {
+            return std::bit_cast<RTypeInstruction>(word);
+        } else {
+            throw std::runtime_error("Couldn't parse instruction");
+        }
+
+    }
 }
