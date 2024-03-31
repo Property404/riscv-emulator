@@ -3,6 +3,9 @@ export module memory;
 import<map>;
 import<vector>;
 import<cstdint>;
+import<typeinfo>;
+import test_harness;
+
 
 export class Memory {
     std::map<size_t, uint8_t> memory;
@@ -39,3 +42,12 @@ public:
         memory[dest + 3] = (val >> 24) & 0xFF;
     }
 };
+
+#include "test/harness.h"
+TEST_CASE(basic, {
+    Memory memory({0xba,0xdd,0xec,0xaf});
+    REQUIRE( memory.load8(0) == 0xba );
+
+    memory.store32(0, 0xDEADBEEF);
+    REQUIRE( memory.load32(0) == 0xDEADBEEF );
+});

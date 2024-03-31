@@ -1,6 +1,5 @@
 import <iostream>;
-import test_framework;
-import <vector>;
+import test_harness;
 
 int main() {
     TestCase::run_all();

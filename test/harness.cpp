@@ -1,7 +1,8 @@
-export module test_framework;
+export module test_harness;
 
 import <iostream>;
 import <vector>;
+import <typeinfo>;
 import <functional>;
 
 using namespace std;
@@ -18,6 +19,19 @@ export class TestCase final {
 
     int assertions_passed;
 
+    template<typename T,typename U>
+    void assert_equals_inner(const char* type1, const char* type2, T value1, U value2){
+        if (value1 != value2) {
+            std::cerr
+                << "Assert failed: "
+                << value1 << "(" << type1 << ")" << " != "
+                << value2 << "(" << type2 << ")" << std::endl;
+            std::exit(1);
+        } else {
+            this->assertions_passed++;
+        }
+    }
+
  public:
     TestCase(const char* file_name, const char* name, Action action);
 
@@ -32,16 +46,13 @@ export class TestCase final {
 
     template<typename T,typename U>
     void assert_equals(const char* type1, const char* type2, T value1, U value2){
-        if (value1 != value2) {
-            std::cerr
-                << "Assert failed: "
-                << value1 << "(" << type1 << ")" << " != "
-                << value2 << "(" << type2 << ")" << std::endl;
-            std::exit(1);
-        } else {
-            this->assertions_passed++;
-        }
+        this->assert_equals_inner<
+                std::remove_reference_t<T>,
+                std::remove_reference_t<U>
+            >
+            (type1, type2, value1, value2);
     }
+
 
     void assert(const char* msg, bool condition){
         if (condition) {
