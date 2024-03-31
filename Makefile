@@ -1,7 +1,7 @@
 CXX=g++
 CXXFLAGS=-std=c++20 -Wall -Wextra -fmodules-ts 
 
-COMMON_OBJECTS=test/harness.o memory.o instruction.o emulator.o
+COMMON_OBJECTS=test/harness.o memory.o instruction.o emulator.o file_util.o
 OBJECTS=$(COMMON_OBJECTS) main.o
 TEST_OBJECTS=$(COMMON_OBJECTS) test/assembly.o test/emulator.o test/main.o
 MODULES=iostream map vector cstdint cstddef cstdlib variant string functional \
@@ -10,6 +10,8 @@ MODULES=iostream map vector cstdint cstddef cstdlib variant string functional \
 
 all: gcm.cache/mark $(OBJECTS) 
 	$(CXX) $(CXXFLAGS) $(OBJECTS)
+run: all
+	./a.out
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) -c $(@:.o=.cpp) -o $@
 unittest: $(TEST_OBJECTS)

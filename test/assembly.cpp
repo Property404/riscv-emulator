@@ -5,17 +5,15 @@ import <fstream>;
 import <iostream>;
 import <optional>;
 import <cassert>;
-import <random>;
 import <stdexcept>;
 import <string>;
-import <string_view>;
 import <vector>;
 import <limits>;
 
+import file_util;
 import test_harness;
 
 using std::string;
-using std::string_view;
 namespace fs = std::filesystem;
 
 static std::vector<uint8_t> assemble(const string& src);
@@ -37,39 +35,15 @@ export class Assembly {
     }
 };
 
-struct TemporaryFile {
-    fs::path inner_path;
-
-    public :
-    TemporaryFile() {
-        this->inner_path = fs::temp_directory_path();
-
-        static std::mt19937_64 generator;
-        std::uniform_int_distribution<uint64_t> distribution(0, std::numeric_limits<uint64_t>::max());
-        const uint64_t random_number = distribution(generator);
-
-        this->inner_path = this->inner_path / (string{"dev.dagans.ricky."} + std::to_string(random_number));
-    }
-
-    const fs::path& path() const {
-        return this->inner_path;
-    }
-
-    ~TemporaryFile() {
-        fs::remove(this->inner_path);
-    }
-};
-
 
 static void run_process(string&& cmd);
 static TemporaryFile write_source(const string& text);
 static TemporaryFile run_assembler(const fs::path& src);
-std::string getFileContents(const fs::path& path);
 
 static std::vector<uint8_t> assemble(const string& src) {
     const auto srcpath = write_source(src + "\n");
     const auto binpath = run_assembler(srcpath.path());
-    const auto contents = getFileContents(binpath.path());
+    const auto contents = FileUtil::get_contents(binpath.path());
     assert(contents.length() != 0);
 
     std::vector<uint8_t> res{};
@@ -110,19 +84,6 @@ static void run_process(string&& cmd) {
     if (pclose(process)) {
         throw std::runtime_error("Process failed: " + cmd);
     }
-}
-
-std::string getFileContents(const fs::path& path) {
-	std::ifstream fp(path.native());
-	std::string contents;
-	std::stringstream buffer;
-	if (fp.fail()) {
-		throw std::runtime_error(string{"Could not open file: "} + path.native());
-	}
-	buffer << fp.rdbuf();
-	contents = buffer.str();
-	fp.close();
-	return contents;
 }
 
 #include "harness.h"

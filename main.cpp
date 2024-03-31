@@ -4,9 +4,15 @@ import <typeinfo>;
 import <iostream>;
 import emulator;
 import memory;
+import file_util;
 
-int main() {
-    Emulator emulator(0, std::vector<uint8_t>{3,1,4,1});
+int main(int argc, const char* argv[]) {
+    if (argc != 2) {
+        std::cerr << "Expected one argument" << std::endl;
+        return 1;
+    }
+    const auto binary = FileUtil::get_contents(argv[1]);
+    Emulator emulator(0, std::vector<uint8_t>(binary.cbegin(), binary.cend()));
 
     // Write
     emulator.register_ecall(64,[](const Emulator& emulator) {
