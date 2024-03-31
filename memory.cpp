@@ -28,7 +28,6 @@ public:
     }
 
     uint32_t load32(size_t dest) const {
-        std::cout << "Loading at " << std::hex << dest <<std::endl;
         return this->memory.at(dest + 3) << 24 |
         this->memory.at(dest + 2) << 16 |
         this->memory.at(dest + 1) << 8 |
@@ -37,10 +36,10 @@ public:
 
     uint64_t load64(size_t dest) const {
         return
-        this->memory.at(dest + 7) << 56 |
-        this->memory.at(dest + 6) << 48 |
-        this->memory.at(dest + 5) << 40 |
-        this->memory.at(dest + 4) << 32 |
+        (uint64_t)(this->memory.at(dest + 7)) << 56 |
+        (uint64_t)(this->memory.at(dest + 6)) << 48 |
+        (uint64_t)(this->memory.at(dest + 5)) << 40 |
+        (uint64_t)(this->memory.at(dest + 4)) << 32 |
         this->memory.at(dest + 3) << 24 |
         this->memory.at(dest + 2) << 16 |
         this->memory.at(dest + 1) << 8 |

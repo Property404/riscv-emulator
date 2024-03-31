@@ -5,6 +5,7 @@ import <typeinfo>;
 import <iostream>;
 import emulator;
 import memory;
+import debug;
 import file_util;
 
 int main(int argc, const char* argv[]) {
@@ -41,12 +42,7 @@ int main(int argc, const char* argv[]) {
     });
 
     if (debug) {
-        std::string input;
-        while (true) {
-            std::cout<<std::hex << emulator.get_ip() << ": " << emulator.current_instruction() << std::endl;
-            std::cin >> input;
-            emulator.step();
-        }
+        interactive_debug(emulator);
     } else {
         emulator.run();
     }
