@@ -11,7 +11,7 @@ import instruction;
 import test_harness;
 
 export class Emulator {
-    uint32_t registers[32] {0};
+    uint64_t registers[32] {0};
     Memory memory;
     size_t ip = 0;
 
@@ -90,8 +90,8 @@ export class Emulator {
     public:
     Emulator(size_t ip, Memory memory) : memory(memory), ip(ip) {}
 
-    uint32_t get_register(size_t index) const {
-        assert(index < sizeof(registers)/sizeof(uint32_t));
+    uint64_t get_register(size_t index) const {
+        assert(index < sizeof(registers)/sizeof(uint64_t));
 
         // x0 is always zero
         if (index == 0) {
@@ -102,7 +102,7 @@ export class Emulator {
     }
 
     int32_t get_register_signed(size_t index) const {
-        assert(index < sizeof(registers)/sizeof(uint32_t));
+        assert(index < sizeof(registers)/sizeof(uint64_t));
 
         // x0 is always zero
         if (index == 0) {
