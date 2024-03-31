@@ -137,7 +137,7 @@ class Emulator {
             this->memory.store32(rs1+instr.sext_imm(), rs2);
         } else if (instr.funct3 == 0x3u) {
             // SD
-            this->memory.store32(rs1+instr.sext_imm(), rs2);
+            this->memory.store64(rs1+instr.sext_imm(), rs2);
         } else {
             throw std::runtime_error("Unknown instruction!");
         }

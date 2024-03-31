@@ -70,6 +70,18 @@ public:
         memory[dest + 2] = (val >> 16) & 0xFF;
         memory[dest + 3] = (val >> 24) & 0xFF;
     }
+
+    void store64(size_t dest, uint64_t val) {
+        std::cout << "Storing at " << std::hex << dest <<std::endl;
+        memory[dest + 0] = (val >> 0) & 0xFF;
+        memory[dest + 1] = (val >> 8) & 0xFF;
+        memory[dest + 2] = (val >> 16) & 0xFF;
+        memory[dest + 3] = (val >> 24) & 0xFF;
+        memory[dest + 4] = (val >> 32) & 0xFF;
+        memory[dest + 5] = (val >> 40) & 0xFF;
+        memory[dest + 6] = (val >> 48) & 0xFF;
+        memory[dest + 7] = (val >> 56) & 0xFF;
+    }
 };
 
 #include "test/harness.h"

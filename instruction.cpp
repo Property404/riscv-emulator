@@ -14,13 +14,13 @@ namespace Instruction {
          uint32_t rs2: 5;
          uint32_t imm7: 7;
 
-         int32_t sext_imm() const {
-             const uint32_t MASK = 0x800;
-             const auto imm = (imm7 << 5) + imm5;
+         int64_t sext_imm() const {
+             const uint64_t MASK = 0x800;
+             const uint64_t imm = (imm7 << 5) + imm5;
              const bool is_negative = imm & MASK;
-             const uint32_t value  = imm & (MASK - 1);
+             const uint64_t value  = imm & (MASK - 1);
              if (is_negative) {
-                 return -value;
+                 return value | ~(MASK-1);
              } else {
                  return value;
              }
