@@ -4,8 +4,28 @@ import <cstdint>;
 import <stdexcept>;
 import test_harness;
 
-
 namespace Instruction {
+    export struct STypeInstruction {
+         uint32_t opcode: 7;
+         uint32_t imm5: 5;
+         uint32_t funct3: 3;
+         uint32_t rs1: 5;
+         uint32_t rs2: 5;
+         uint32_t imm7: 7;
+
+         int32_t sext_imm() const {
+             const uint32_t MASK = 0x800;
+             const auto imm = (imm7 << 5) + imm5;
+             const bool is_negative = imm & MASK;
+             const uint32_t value  = imm & (MASK - 1);
+             if (is_negative) {
+                 return -value;
+             } else {
+                 return value;
+             }
+         }
+    };
+
     export struct RTypeInstruction {
          uint32_t opcode: 7;
          uint32_t rd: 5;
@@ -32,20 +52,27 @@ namespace Instruction {
                  return value;
              }
          }
+
+         uint32_t zext_imm() const {
+             return this->imm;
+         }
     };
 
-    export std::variant<RTypeInstruction, ITypeInstruction> parse(uint32_t word) {
+    export std::variant<RTypeInstruction, ITypeInstruction, STypeInstruction> parse(uint32_t word) {
         const auto opcode = word & 0b0111'1111;
         if (opcode == 0b0110011)  {
             return std::bit_cast<RTypeInstruction>(word);
-        } else if(opcode == 0b0010011) {
+        } else if(opcode == 0b0010011 || opcode == 0b0000011) {
             return std::bit_cast<ITypeInstruction>(word);
+        } else if(opcode == 0b0100011) {
+            return std::bit_cast<STypeInstruction>(word);
         } else {
             throw std::runtime_error("Couldn't parse instruction");
         }
 
     }
 }
+
 
 #include "test/harness.h"
 TEST_CASE(parse_i_type, {

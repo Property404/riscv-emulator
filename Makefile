@@ -1,18 +1,17 @@
 CXX=g++
 CXXFLAGS=-std=c++20 -Wall -Wextra -fmodules-ts 
-LD=g++
-LDFLAGS=-std=c++20 -fmodules-ts
 
 OBJECTS=test/harness.o memory.o instruction.o emulator.o
-TEST_OBJECTS=$(OBJECTS) test/main.o
+TEST_OBJECTS=$(OBJECTS) test/assembly.o test/emulator.o test/main.o
 MODULES=iostream map vector cstdint cstddef cstdlib variant string functional \
-		typeinfo new stdexcept
+		typeinfo new stdexcept fstream filesystem string_view optional random \
+		limits cassert
 
 all: gcm.cache/mark $(OBJECTS) 
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) -c $(@:.o=.cpp) -o $@
 unittest: $(TEST_OBJECTS)
-	$(LD) $(LDFLAGS) $(TEST_OBJECTS) -o unittest
+	$(CXX) $(CXXFLAGS) $(TEST_OBJECTS) -o unittest
 .PHONY: test
 test: gcm.cache/mark unittest
 	./unittest
