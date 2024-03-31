@@ -4,7 +4,6 @@ import<map>;
 import<vector>;
 import<cstdint>;
 
-
 export class Memory {
     std::map<size_t, uint8_t> memory;
 
@@ -13,6 +12,9 @@ public:
         for (size_t i=0; i < vec.size(); i++) {
             this->memory[i] = vec[i];
         }
+    }
+
+    Memory() {
     }
 
     uint8_t load8(size_t dest) const {

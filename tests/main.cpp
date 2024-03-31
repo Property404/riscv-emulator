@@ -1,11 +1,8 @@
-#include <catch2/catch_session.hpp>
+import <iostream>;
+import test_framework;
+import <vector>;
 
-int main( int argc, char* argv[] ) {
-  // your setup ...
-
-  int result = Catch::Session().run( argc, argv );
-
-  // your clean-up...
-
-  return result;
+int main() {
+    TestCase::run_all();
+    return 0;
 }
