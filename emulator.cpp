@@ -14,10 +14,20 @@ import instruction;
 import test_harness;
 
 export class Emulator;
-
 using RegType = uint64_t;
-using ECall = std::function<void(Emulator&)>;
+
+export namespace Register {
+    const size_t ZERO = 0;
+    const size_t RA = 1;
+    const size_t SP = 2;
+    const size_t ARG0 = 10;
+    const size_t ARG1 = 11;
+    const size_t ARG2 = 12;
+    const size_t ARG7 = 17;
+};
+
 class Emulator {
+    using ECall = std::function<void(Emulator&)>;
     RegType registers[32] {0};
     Memory memory;
     size_t ip = 0;
@@ -40,22 +50,49 @@ class Emulator {
             } else if (instr.funct3 == 0x07u) {
                 // ANDI
                 rd = rs1 & instr.sext_imm();
+            } else if (instr.funct3 == 0x01u && ((instr.imm >> 6) == 0x00)) {
+                // SLLI
+                rd = rs1 << (instr.imm & 0x3F);
+            } else if (instr.funct3 == 0x05u && ((instr.imm >> 6) == 0x00)) {
+                // SRLI
+                rd = rs1 >> (instr.imm & 0x3F);
+            } else {
+                throw std::runtime_error("Unknown I-type instruction!");
+            }
+        } else if (instr.opcode == 0b0011011u) {
+            if (instr.funct3 == 0x00u) {
+                // ADDIW
+                rd &= 0xFFFFFFFF'00000000;
+                rd |= (uint32_t)(rs1) + (uint32_t)(instr.sext_imm());
             } else {
                 throw std::runtime_error("Unknown I-type instruction!");
             }
         } else if (instr.opcode == 0b000011) {
             if (instr.funct3 == 0x02u) {
                 // LW
+                rd = (int32_t)(this->memory.load32(rs1 + instr.zext_imm()));
+            } else if (instr.funct3 == 0x03u) {
+                // LD
+                rd = this->memory.load64(rs1 + instr.zext_imm());
+            } else if (instr.funct3 == 0x04u) {
+                // LBU
+                rd = this->memory.load8(rs1 + instr.zext_imm());
+            } else if (instr.funct3 == 0x06u) {
+                // LWU
                 rd = this->memory.load32(rs1 + instr.zext_imm());
             } else {
-                throw std::runtime_error("Unknown I-type load instruction!");
+                throw std::runtime_error("Unknown I-type load instruction: " + std::to_string(instr.funct3));
             }
         } else if (instr.opcode == 0b1110011 && instr.imm == 0) {
             // ECALL
             const auto a7 = this->get_register(17);
             this->ecalls.at(a7)(*this);
+        } else if (instr.opcode == 0b1100111 && instr.funct3 == 0) {
+            // JALR
+            rd = this->ip + 4;
+            this->ip += rs1 + instr.sext_imm() - 4;
         } else {
-            throw std::runtime_error("Unknown I-type opcode!");
+            throw std::runtime_error("Unknown I-type instruction!");
         }
     }
 
@@ -109,6 +146,9 @@ class Emulator {
         if (instr.opcode == 0b0010111u) {
             // AUIPC
             rd = (this->ip - 4) + instr.zext_imm();
+        } else if (instr.opcode == 0b0110111u) {
+            // LUI
+            rd = instr.zext_imm();
         } else {
             throw std::runtime_error("Unknown U-type instruction!");
         }
@@ -148,6 +188,9 @@ class Emulator {
 
     public:
     Emulator(size_t ip, Memory memory) : memory(memory), ip(ip) {
+        const auto INITIAL_STACK_BOTTOM = 0x100000;
+        const auto INITIAL_STACK_TOP = INITIAL_STACK_BOTTOM + 0x1000;
+        this->registers[Register::SP] = INITIAL_STACK_TOP;
     }
 
     RegType get_register(size_t index) const {
@@ -214,14 +257,4 @@ class Emulator {
             step();
         }
     }
-};
-
-export namespace Register {
-    const size_t ZERO = 0;
-    const size_t RA = 1;
-    const size_t SP = 2;
-    const size_t ARG0 = 10;
-    const size_t ARG1 = 11;
-    const size_t ARG2 = 12;
-    const size_t ARG7 = 17;
 };

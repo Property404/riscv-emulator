@@ -121,7 +121,7 @@ namespace Instruction {
         const auto opcode = word & 0b0111'1111;
         if (opcode == 0b0110011)  {
             return std::bit_cast<RTypeInstruction>(word);
-        } else if(opcode == 0b0010011 || opcode == 0b0000011 || opcode == 0b1110011) {
+        } else if(opcode == 0b0010011 || opcode == 0b0000011 || opcode == 0b1110011 || opcode == 0b0011011 || opcode == 0b1100111) {
             return std::bit_cast<ITypeInstruction>(word);
         } else if(opcode == 0b0100011) {
             return std::bit_cast<STypeInstruction>(word);

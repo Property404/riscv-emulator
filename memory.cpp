@@ -2,6 +2,7 @@ export module memory;
 
 import<map>;
 import<vector>;
+import<iostream>;
 import<cstdint>;
 import test_harness;
 
@@ -27,13 +28,27 @@ public:
     }
 
     uint32_t load32(size_t dest) const {
+        std::cout << "Loading at " << std::hex << dest <<std::endl;
         return this->memory.at(dest + 3) << 24 |
         this->memory.at(dest + 2) << 16 |
         this->memory.at(dest + 1) << 8 |
             this-> memory.at(dest);
     }
 
+    uint64_t load64(size_t dest) const {
+        return
+        this->memory.at(dest + 7) << 56 |
+        this->memory.at(dest + 6) << 48 |
+        this->memory.at(dest + 5) << 40 |
+        this->memory.at(dest + 4) << 32 |
+        this->memory.at(dest + 3) << 24 |
+        this->memory.at(dest + 2) << 16 |
+        this->memory.at(dest + 1) << 8 |
+            this-> memory.at(dest);
+    }
+
     void store32(size_t dest, uint32_t val) {
+        std::cout << "Storing at " << std::hex << dest <<std::endl;
         memory[dest + 0] = (val >> 0) & 0xFF;
         memory[dest + 1] = (val >> 8) & 0xFF;
         memory[dest + 2] = (val >> 16) & 0xFF;
