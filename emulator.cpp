@@ -89,7 +89,7 @@ class Emulator {
             this->ecalls.at(a7)(*this);
         } else if (instr.opcode == 0b1100111 && instr.funct3 == 0) {
             // JALR
-            rd = this->ip + 4;
+            rd = this->ip;
             this->ip += rs1 + instr.sext_imm() - 4;
         } else {
             throw std::runtime_error("Unknown I-type instruction!");
@@ -179,7 +179,7 @@ class Emulator {
 
         if (instr.opcode == 0b1101111) {
             // JAL
-            rd = this->ip + 4;
+            rd = this->ip;
             this->ip += instr.sext_imm() - 4;
         } else {
             throw std::runtime_error("Unknown J-type instruction!");
