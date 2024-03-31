@@ -90,3 +90,35 @@ next:
     REQUIRE_EQUALS(emulator.get_register(Register::RA), 0x08u);
     REQUIRE_EQUALS(emulator.get_ip(), 0x0cu);
 });
+
+  //ec:	fec42783          	lw	a5,-20(s0)
+
+TEST_CASE(lw_negative_offset, {
+    Assembly assembly{R"TEXT(
+    addi fp, zero, 0x100
+    lw	a5,-20(fp)
+    )TEXT"};
+
+    //memory.store32(0x100 - 20, 0xdecaf000);
+    Emulator emulator(0, assembly.bytes());
+    emulator.get_memory_mut().store32(0x100 - 20, 0x0decaf00);
+
+    emulator.step();
+    REQUIRE_EQUALS(emulator.get_register(Register::FP), 0x100u);
+    emulator.step();
+    REQUIRE_EQUALS(emulator.get_register(Register::ARG5), 0x0decaf00);
+});
+
+TEST_CASE(sw_negative_offset, {
+    Assembly assembly{R"TEXT(
+    addi fp, zero, 0x100
+    sw	x0,-20(fp)
+    )TEXT"};
+
+    //memory.store32(0x100 - 20, 0xdecaf000);
+    Emulator emulator(0, assembly.bytes());
+    emulator.step();
+    REQUIRE_EQUALS(emulator.get_register(Register::FP), 0x100u);
+    emulator.step();
+    REQUIRE_EQUALS(emulator.get_memory().load32(0x100 - 20), 0u);
+});

@@ -20,9 +20,12 @@ export namespace Register {
     const size_t ZERO = 0;
     const size_t RA = 1;
     const size_t SP = 2;
+    const size_t FP = 8;
     const size_t ARG0 = 10;
     const size_t ARG1 = 11;
     const size_t ARG2 = 12;
+    const size_t ARG5 = 15;
+    const size_t ARG6 = 16;
     const size_t ARG7 = 17;
 };
 
@@ -70,10 +73,10 @@ class Emulator {
         } else if (instr.opcode == 0b000011) {
             if (instr.funct3 == 0x02u) {
                 // LW
-                rd = (int32_t)(this->memory.load32(rs1 + instr.zext_imm()));
+                rd = (int32_t)(this->memory.load32(rs1 + instr.sext_imm()));
             } else if (instr.funct3 == 0x03u) {
                 // LD
-                rd = this->memory.load64(rs1 + instr.zext_imm());
+                rd = this->memory.load64(rs1 + instr.sext_imm());
             } else if (instr.funct3 == 0x04u) {
                 // LBU
                 rd = this->memory.load8(rs1 + instr.zext_imm());
@@ -213,6 +216,10 @@ class Emulator {
     }
 
     const Memory& get_memory() const {
+        return this->memory;
+    }
+
+    Memory& get_memory_mut() {
         return this->memory;
     }
 
