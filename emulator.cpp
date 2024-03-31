@@ -162,12 +162,12 @@ class Emulator {
         if (instr.funct3 == 0x0) {
             // BEQ
             if (rs1 == rs2) {
-                this->ip += instr.sext_imm();
+                this->ip += instr.sext_imm() - 4;
             }
         } else if (instr.funct3 == 0x1) {
             // BNE
             if (rs1 != rs2) {
-                this->ip += instr.sext_imm();
+                this->ip += instr.sext_imm() - 4;
             }
         } else {
             throw std::runtime_error("Unknown B-type instruction!");
@@ -188,9 +188,6 @@ class Emulator {
 
     public:
     Emulator(size_t ip, Memory memory) : memory(memory), ip(ip) {
-        const auto INITIAL_STACK_BOTTOM = 0x100000;
-        const auto INITIAL_STACK_TOP = INITIAL_STACK_BOTTOM + 0x1000;
-        this->registers[Register::SP] = INITIAL_STACK_TOP;
     }
 
     RegType get_register(size_t index) const {
