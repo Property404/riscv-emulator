@@ -1,5 +1,6 @@
 import <vector>;
 import <cstdint>;
+import <string>;
 import <typeinfo>;
 import <iostream>;
 import emulator;
@@ -7,9 +8,15 @@ import memory;
 import file_util;
 
 int main(int argc, const char* argv[]) {
-    if (argc != 2) {
+    if (argc != 2 && argc != 3 ) {
         std::cerr << "Expected one argument" << std::endl;
         return 1;
+    }
+    bool debug = false;
+    if (argv[1]  == std::string{"--debug"}) {
+        debug = true;
+        argc--;
+        argv++;
     }
     const auto binary = FileUtil::get_contents(argv[1]);
     Emulator emulator(0, std::vector<uint8_t>(binary.cbegin(), binary.cend()));
@@ -33,5 +40,14 @@ int main(int argc, const char* argv[]) {
             std::exit(emulator.get_register(Register::ARG0));
     });
 
-    emulator.run();
+    if (debug) {
+        std::string input;
+        while (true) {
+            std::cout<<std::hex << emulator.get_ip() << ": " << emulator.current_instruction() << std::endl;
+            std::cin >> input;
+            emulator.step();
+        }
+    } else {
+        emulator.run();
+    }
 }

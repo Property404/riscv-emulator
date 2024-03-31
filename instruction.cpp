@@ -94,7 +94,30 @@ namespace Instruction {
          }
     };
 
-    export std::variant<BTypeInstruction, RTypeInstruction, ITypeInstruction, STypeInstruction, UTypeInstruction> parse(uint32_t word) {
+    export struct JTypeInstruction {
+         uint32_t opcode: 7;
+         uint32_t rd: 5;
+         uint32_t imm19_12: 8;
+         uint32_t imm11: 1;
+         uint32_t imm10_1: 10;
+         uint32_t imm20: 1;
+
+         int64_t sext_imm() const {
+             const bool is_negative = this->imm20;
+             const uint64_t value  = this->zext_imm();
+             if (is_negative) {
+                 return value | ~((1<<20) - 1);
+             } else {
+                 return value;
+             }
+         }
+
+         uint64_t zext_imm() const {
+             return (this->imm19_12 << 12) | (this->imm11 << 11) | (this->imm10_1 << 1) | (this->imm20 << 20);
+         }
+    };
+
+    export std::variant<JTypeInstruction,BTypeInstruction, RTypeInstruction, ITypeInstruction, STypeInstruction, UTypeInstruction> parse(uint32_t word) {
         const auto opcode = word & 0b0111'1111;
         if (opcode == 0b0110011)  {
             return std::bit_cast<RTypeInstruction>(word);
@@ -106,6 +129,8 @@ namespace Instruction {
             return std::bit_cast<UTypeInstruction>(word);
         } else if(opcode == 0b1100011) {
             return std::bit_cast<BTypeInstruction>(word);
+        } else if(opcode == 0b1101111) {
+            return std::bit_cast<JTypeInstruction>(word);
         } else {
             throw std::runtime_error(std::string{"Couldn't parse instructions with opcode: "} + std::to_string(opcode));
         }

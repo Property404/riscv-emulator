@@ -93,6 +93,10 @@ class Emulator {
         const auto rs2 = this->get_register(instr.rs2);
 
         if (instr.funct3 == 0x2u) {
+            // SW
+            this->memory.store32(rs1+instr.sext_imm(), rs2);
+        } else if (instr.funct3 == 0x3u) {
+            // SD
             this->memory.store32(rs1+instr.sext_imm(), rs2);
         } else {
             throw std::runtime_error("Unknown instruction!");
@@ -112,7 +116,7 @@ class Emulator {
 
     void execute_b_type(Instruction::BTypeInstruction instr) {
         assert(instr.opcode == 0b1100011);
-        const auto rs1 = this->get_register_signed(instr.rs1);
+        const auto rs1 = this->get_register(instr.rs1);
         const auto rs2 = this->get_register(instr.rs2);
 
         if (instr.funct3 == 0x0) {
@@ -127,6 +131,18 @@ class Emulator {
             }
         } else {
             throw std::runtime_error("Unknown B-type instruction!");
+        }
+    }
+
+    void execute_j_type(Instruction::JTypeInstruction instr) {
+        auto& rd = this->registers[instr.rd];
+
+        if (instr.opcode == 0b1101111) {
+            // JAL
+            rd = this->ip + 4;
+            this->ip += instr.sext_imm() - 4;
+        } else {
+            throw std::runtime_error("Unknown J-type instruction!");
         }
     }
 
@@ -168,6 +184,10 @@ class Emulator {
         return this->ip;
     }
 
+    uint32_t current_instruction() const {
+        return memory.load32(this->ip);
+    }
+
     void step() {
         const auto next_instruction = Instruction::parse(memory.load32(this->ip));
         this->ip += 4;
@@ -182,6 +202,8 @@ class Emulator {
             this->execute_u_type(std::get<Instruction::UTypeInstruction>(next_instruction));
         } else if (std::holds_alternative<Instruction::BTypeInstruction>(next_instruction)) {
             this->execute_b_type(std::get<Instruction::BTypeInstruction>(next_instruction));
+        } else if (std::holds_alternative<Instruction::JTypeInstruction>(next_instruction)) {
+            this->execute_j_type(std::get<Instruction::JTypeInstruction>(next_instruction));
         } else {
             throw std::runtime_error("Unhandled instruction type");
         }
