@@ -3,6 +3,8 @@ export module memory;
 import<map>;
 import<vector>;
 import<iostream>;
+import<stdexcept>;
+import<sstream>;
 import<cstdint>;
 import test_harness;
 
@@ -20,6 +22,11 @@ public:
     }
 
     uint8_t load8(size_t dest) const {
+        if (!memory.contains(dest)) {
+            std::stringstream ss;
+            ss << "Unable to access byte at 0x" << std::hex << dest;
+            throw std::runtime_error(ss.str());
+        }
         return this->memory.at(dest);
     }
 
@@ -28,6 +35,11 @@ public:
     }
 
     uint32_t load32(size_t dest) const {
+        if (!memory.contains(dest)) {
+            std::stringstream ss;
+            ss << "Unable to access 32-bit word at 0x" << std::hex << dest;
+            throw std::runtime_error(ss.str());
+        }
         return this->memory.at(dest + 3) << 24 |
         this->memory.at(dest + 2) << 16 |
         this->memory.at(dest + 1) << 8 |
@@ -35,6 +47,11 @@ public:
     }
 
     uint64_t load64(size_t dest) const {
+        if (!memory.contains(dest)) {
+            std::stringstream ss;
+            ss << "Unable to access double at 0x" << std::hex << dest;
+            throw std::runtime_error(ss.str());
+        }
         return
         (uint64_t)(this->memory.at(dest + 7)) << 56 |
         (uint64_t)(this->memory.at(dest + 6)) << 48 |
