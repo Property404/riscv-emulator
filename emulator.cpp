@@ -2,6 +2,7 @@ export module emulator;
 
 import <cstdint>;
 import <cstddef>;
+import <iostream>;
 import <stdexcept>;
 import <variant>;
 import <map>;
@@ -98,6 +99,17 @@ class Emulator {
         }
     }
 
+    void execute_u_type(Instruction::UTypeInstruction instr) {
+        auto& rd = this->registers[instr.rd];
+
+        if (instr.opcode == 0b0010111u) {
+            // AUIPC
+            rd = (this->ip - 4) + instr.zext_imm();
+        } else {
+            throw std::runtime_error("Unknown U-type instruction!");
+        }
+    }
+
     public:
     Emulator(size_t ip, Memory memory) : memory(memory), ip(ip) {
     }
@@ -146,8 +158,16 @@ class Emulator {
             this->execute_r_type(std::get<Instruction::RTypeInstruction>(next_instruction));
         } else if (std::holds_alternative<Instruction::STypeInstruction>(next_instruction)) {
             this->execute_s_type(std::get<Instruction::STypeInstruction>(next_instruction));
+        } else if (std::holds_alternative<Instruction::UTypeInstruction>(next_instruction)) {
+            this->execute_u_type(std::get<Instruction::UTypeInstruction>(next_instruction));
         } else {
             throw std::runtime_error("Unhandled instruction type");
+        }
+    }
+
+    void run() {
+        while(true) {
+            step();
         }
     }
 };

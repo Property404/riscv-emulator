@@ -23,6 +23,22 @@ TEST_CASE(adding, {
     REQUIRE_EQUALS(emulator.get_register(2), 84u);
 });
 
+#include "harness.h"
+TEST_CASE(sub_by_add, {
+    Assembly assembly{R"TEXT(
+    li x1, 25
+    add x1, x1, -5 
+    )TEXT"};
+    Emulator emulator(0, assembly.bytes());
+
+    REQUIRE_EQUALS(emulator.get_ip(), 0u);
+
+    emulator.step();
+    emulator.step();
+    REQUIRE_EQUALS(emulator.get_register(1), 20u);
+});
+
+
 TEST_CASE(load_store, {
     Assembly assembly{R"TEXT(
     addi x1, x0, 42 
@@ -39,4 +55,20 @@ TEST_CASE(load_store, {
 
     emulator.step();
     REQUIRE_EQUALS(emulator.get_register(3), 42u);
+});
+
+TEST_CASE(auipc, {
+    Assembly assembly{R"TEXT(
+    nop
+    nop
+    auipc x1, 0x800
+    )TEXT"};
+
+    Emulator emulator(0, assembly.bytes());
+
+    emulator.step();
+    emulator.step();
+    emulator.step();
+
+    REQUIRE_EQUALS(emulator.get_register(1), 0x800008u);
 });

@@ -10,8 +10,6 @@ MODULES=iostream map vector cstdint cstddef cstdlib variant string functional \
 
 all: gcm.cache/mark $(OBJECTS) 
 	$(CXX) $(CXXFLAGS) $(OBJECTS)
-run: all
-	./a.out
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) -c $(@:.o=.cpp) -o $@
 unittest: $(TEST_OBJECTS)
