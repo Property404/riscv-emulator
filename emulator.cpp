@@ -110,6 +110,26 @@ class Emulator {
         }
     }
 
+    void execute_b_type(Instruction::BTypeInstruction instr) {
+        assert(instr.opcode == 0b1100011);
+        const auto rs1 = this->get_register_signed(instr.rs1);
+        const auto rs2 = this->get_register(instr.rs2);
+
+        if (instr.funct3 == 0x0) {
+            // BEQ
+            if (rs1 == rs2) {
+                this->ip += instr.sext_imm();
+            }
+        } else if (instr.funct3 == 0x1) {
+            // BNE
+            if (rs1 != rs2) {
+                this->ip += instr.sext_imm();
+            }
+        } else {
+            throw std::runtime_error("Unknown B-type instruction!");
+        }
+    }
+
     public:
     Emulator(size_t ip, Memory memory) : memory(memory), ip(ip) {
     }
@@ -160,6 +180,8 @@ class Emulator {
             this->execute_s_type(std::get<Instruction::STypeInstruction>(next_instruction));
         } else if (std::holds_alternative<Instruction::UTypeInstruction>(next_instruction)) {
             this->execute_u_type(std::get<Instruction::UTypeInstruction>(next_instruction));
+        } else if (std::holds_alternative<Instruction::BTypeInstruction>(next_instruction)) {
+            this->execute_b_type(std::get<Instruction::BTypeInstruction>(next_instruction));
         } else {
             throw std::runtime_error("Unhandled instruction type");
         }

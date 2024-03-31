@@ -1,5 +1,6 @@
 export module instruction;
 import <variant>;
+import <string>;
 import <cstdint>;
 import <stdexcept>;
 import test_harness;
@@ -68,7 +69,32 @@ namespace Instruction {
          }
     };
 
-    export std::variant<RTypeInstruction, ITypeInstruction, STypeInstruction, UTypeInstruction> parse(uint32_t word) {
+    export struct BTypeInstruction {
+         uint32_t opcode: 7;
+         uint32_t imm11: 1;
+         uint32_t imm4_1: 4;
+         uint32_t funct3: 3;
+         uint32_t rs1: 5;
+         uint32_t rs2: 5;
+         uint32_t imm10_5: 6;
+         uint32_t imm12: 1;
+
+         int64_t sext_imm() const {
+             const bool is_negative = this->imm12;
+             const uint64_t value  = this->zext_imm();
+             if (is_negative) {
+                 return value | ~((1<<12) - 1);
+             } else {
+                 return value;
+             }
+         }
+
+         uint64_t zext_imm() const {
+             return (this->imm4_1 << 1) | (this->imm10_5 << 5) | (this->imm11 << 11);
+         }
+    };
+
+    export std::variant<BTypeInstruction, RTypeInstruction, ITypeInstruction, STypeInstruction, UTypeInstruction> parse(uint32_t word) {
         const auto opcode = word & 0b0111'1111;
         if (opcode == 0b0110011)  {
             return std::bit_cast<RTypeInstruction>(word);
@@ -78,10 +104,11 @@ namespace Instruction {
             return std::bit_cast<STypeInstruction>(word);
         } else if(opcode == 0b0110111 || opcode == 0b0010111) {
             return std::bit_cast<UTypeInstruction>(word);
+        } else if(opcode == 0b1100011) {
+            return std::bit_cast<BTypeInstruction>(word);
         } else {
-            throw std::runtime_error("Couldn't parse instruction");
+            throw std::runtime_error(std::string{"Couldn't parse instructions with opcode: "} + std::to_string(opcode));
         }
-
     }
 }
 
