@@ -4,18 +4,25 @@ import <cstdint>;
 import <cstddef>;
 import <stdexcept>;
 import <variant>;
+import <map>;
 import <cassert>;
+import <functional>;
 
 import memory;
 import instruction;
 import test_harness;
 
-export class Emulator {
-    uint64_t registers[32] {0};
+export class Emulator;
+
+using RegType = uint64_t;
+using ECall = std::function<void(Emulator&)>;
+class Emulator {
+    RegType registers[32] {0};
     Memory memory;
     size_t ip = 0;
+    std::map<RegType, ECall> ecalls{};
 
-    void execute_i_type(Instruction::ITypeInstruction instr) {
+    void execute_i_type(const Instruction::ITypeInstruction instr) {
         const auto rs1 = this->get_register_signed(instr.rs1);
         auto& rd = this->registers[instr.rd];
 
@@ -42,6 +49,10 @@ export class Emulator {
             } else {
                 throw std::runtime_error("Unknown I-type load instruction!");
             }
+        } else if (instr.opcode == 0b1110011 && instr.imm == 0) {
+            // ECALL
+            const auto a7 = this->get_register(17);
+            this->ecalls.at(a7)(*this);
         } else {
             throw std::runtime_error("Unknown I-type opcode!");
         }
@@ -88,10 +99,11 @@ export class Emulator {
     }
 
     public:
-    Emulator(size_t ip, Memory memory) : memory(memory), ip(ip) {}
+    Emulator(size_t ip, Memory memory) : memory(memory), ip(ip) {
+    }
 
-    uint64_t get_register(size_t index) const {
-        assert(index < sizeof(registers)/sizeof(uint64_t));
+    RegType get_register(size_t index) const {
+        assert(index < sizeof(registers)/sizeof(RegType));
 
         // x0 is always zero
         if (index == 0) {
@@ -102,7 +114,7 @@ export class Emulator {
     }
 
     int32_t get_register_signed(size_t index) const {
-        assert(index < sizeof(registers)/sizeof(uint64_t));
+        assert(index < sizeof(registers)/sizeof(RegType));
 
         // x0 is always zero
         if (index == 0) {
@@ -114,6 +126,10 @@ export class Emulator {
 
     const Memory& get_memory() const {
         return this->memory;
+    }
+
+    void register_ecall(RegType num, ECall&& call) {
+        this->ecalls[num] = call;
     }
 
     size_t get_ip() const {
@@ -134,4 +150,14 @@ export class Emulator {
             throw std::runtime_error("Unhandled instruction type");
         }
     }
+};
+
+export namespace Register {
+    const size_t ZERO = 0;
+    const size_t RA = 1;
+    const size_t SP = 2;
+    const size_t ARG0 = 10;
+    const size_t ARG1 = 11;
+    const size_t ARG2 = 12;
+    const size_t ARG7 = 17;
 };
