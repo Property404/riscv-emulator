@@ -3,9 +3,7 @@ export module memory;
 import<map>;
 import<vector>;
 import<cstdint>;
-import<typeinfo>;
 import test_harness;
-
 
 export class Memory {
     std::map<size_t, uint8_t> memory;

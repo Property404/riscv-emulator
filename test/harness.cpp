@@ -2,14 +2,12 @@ export module test_harness;
 
 import <iostream>;
 import <vector>;
-import <typeinfo>;
-import <functional>;
 
 using namespace std;
 
 
 export class TestCase final {
-    using Action = std::function<void(TestCase*)>;
+    using Action = void(*)(TestCase*);
 
     // The test procedure itself.
     Action action;
