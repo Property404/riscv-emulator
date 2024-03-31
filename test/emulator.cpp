@@ -72,3 +72,21 @@ TEST_CASE(auipc, {
 
     REQUIRE_EQUALS(emulator.get_register(1), 0x800008u);
 });
+
+TEST_CASE(jal, {
+    Assembly assembly{R"TEXT(
+    nop
+    jal next
+    nop
+next:
+    nop
+    )TEXT"};
+
+    Emulator emulator(0, assembly.bytes());
+
+    emulator.step();
+    emulator.step();
+
+    REQUIRE_EQUALS(emulator.get_register(Register::RA), 0x08u);
+    REQUIRE_EQUALS(emulator.get_ip(), 0x0cu);
+});
