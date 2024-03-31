@@ -3,9 +3,11 @@ export module debug;
 import <iostream>;
 import <string>;
 import <string_view>;
+import <sstream>;
 import <vector>;
 import <ranges>;
 import <optional>;
+import <unordered_set>;
 
 import emulator;
 
@@ -20,6 +22,7 @@ static std::vector<string> split_string(const string& str);
 
 export void interactive_debug(Emulator& emulator) {
     string input;
+    std::unordered_set<size_t> breaks;
 
     while (true) {
         cout<<hex << "0x" << emulator.get_ip() << ": 0x" << emulator.current_instruction() << endl;
@@ -30,6 +33,22 @@ export void interactive_debug(Emulator& emulator) {
             if (args.size() == 0 || args.at(0) == "s") {
                 emulator.step();
                 break;
+            } else if (args.at(0) == "c") {
+                do{
+                    emulator.step();
+                }while(! breaks.contains(emulator.get_ip()));
+                break;
+            } else if (args.at(0) == "b" || args.at(0) == "break") {
+                if (args.size() != 2) {
+                    cout << "Expected one argument for b/reak" << endl;
+                    continue;
+                }
+                size_t breakpoint;
+                std::stringstream ss;
+                ss << std::hex << args.at(1);
+                ss >> breakpoint;
+                breaks.insert(breakpoint);
+                cout << "Set breakpoint at 0x" << std::hex << breakpoint << endl;
             } else if (args.at(0) == "reg") {
                 if (args.size() < 2) {
                     cout << "Expected at least one argument for reg" << endl;
@@ -86,6 +105,13 @@ static std::optional<size_t> register_from_string(const string& reg) {
         {"x11", "a1"},
         {"x12", "a2"},
         {"x12", "a2"},
+        {"x13", "a3"},
+        {"x14", "a4"},
+        {"x15", "a5"},
+        {"x16", "a6"},
+        {"x17", "a7"},
+        {"x18", "s2"},
+        {"x19", "s3"},
     };
 
     for (unsigned i=0;i<sizeof(table)/sizeof(table[0]);i++) {
