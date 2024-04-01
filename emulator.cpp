@@ -20,6 +20,9 @@ export namespace Register {
     const size_t ZERO = 0;
     const size_t RA = 1;
     const size_t SP = 2;
+    const size_t T0 = 5;
+    const size_t T1 = 6;
+    const size_t T2 = 7;
     const size_t FP = 8;
     const size_t ARG0 = 10;
     const size_t ARG1 = 11;
@@ -27,6 +30,10 @@ export namespace Register {
     const size_t ARG5 = 15;
     const size_t ARG6 = 16;
     const size_t ARG7 = 17;
+    const size_t T3 = 28;
+    const size_t T4 = 29;
+    const size_t T5 = 30;
+    const size_t T6 = 31;
 };
 
 class Emulator {
@@ -111,7 +118,7 @@ class Emulator {
                 rd = rs2 + rs1;
             } else if (instr.funct3 == 0x0u && instr.funct7 == 0x20) {
                 // SUB
-                rd = rs2 - rs1;
+                rd = rs1 - rs2;
             } else if (instr.funct3 == 0x4u && instr.funct7 == 0x00) {
                 // XOR
                 rd = rs2 ^ rs1;
@@ -127,12 +134,12 @@ class Emulator {
         } else if(instr.opcode == 0b0111011) {
             if (instr.funct3 == 0x0u && instr.funct7 == 0b0100000) {
                 // SUBW TODO: do this conversion properly
-                rd = static_cast<int32_t>(rs2 & 0xFFFF'FFFF) -
-                    static_cast<int32_t>(rs1 & 0xFFFF'FFFF);
+                rd = static_cast<int32_t>(rs1 & 0xFFFF'FFFF) -
+                    static_cast<int32_t>(rs2 & 0xFFFF'FFFF);
             } else if (instr.funct3 == 0x5u && instr.funct7 == 0b0000000) {
                 // SRLW TODO: do this conversion properly
-                rd = static_cast<int32_t>(rs2 & 0xFFFF'FFFF) >>
-                    static_cast<int32_t>(rs1 & 0xFFFF'FFFF);
+                rd = static_cast<int32_t>(rs1 & 0xFFFF'FFFF) >>
+                    static_cast<int32_t>(rs2 & 0xFFFF'FFFF);
             } else {
                 throw std::runtime_error("Unknown R-type instruction(W)!");
             }
