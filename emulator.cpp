@@ -122,7 +122,7 @@ class Emulator {
             // OR
             rd = rs2 & rs1;
         } else {
-            throw std::runtime_error("Unknown instruction!");
+            throw std::runtime_error("Unknown R-type instruction!");
         }
     }
 
@@ -139,7 +139,7 @@ class Emulator {
             // SD
             this->memory.store64(rs1+instr.sext_imm(), rs2);
         } else {
-            throw std::runtime_error("Unknown instruction!");
+            throw std::runtime_error("Unknown S-type instruction!");
         }
     }
 
