@@ -76,13 +76,13 @@ class Emulator {
                 rd = (int32_t)(this->memory.load32(rs1 + instr.sext_imm()));
             } else if (instr.funct3 == 0x03u) {
                 // LD
-                rd = this->memory.load64(rs1 + instr.sext_imm());
+                rd = (int64_t)(this->memory.load64(rs1 + instr.sext_imm()));
             } else if (instr.funct3 == 0x04u) {
                 // LBU
-                rd = this->memory.load8(rs1 + instr.zext_imm());
+                rd = this->memory.load8(rs1 + instr.sext_imm());
             } else if (instr.funct3 == 0x06u) {
                 // LWU
-                rd = this->memory.load32(rs1 + instr.zext_imm());
+                rd = this->memory.load32(rs1 + instr.sext_imm());
             } else {
                 throw std::runtime_error("Unknown I-type load instruction: " + std::to_string(instr.funct3));
             }
@@ -93,7 +93,7 @@ class Emulator {
         } else if (instr.opcode == 0b1100111 && instr.funct3 == 0) {
             // JALR
             rd = this->ip;
-            this->ip += rs1 + instr.sext_imm() - 4;
+            this->ip = rs1 + instr.sext_imm();
         } else {
             throw std::runtime_error("Unknown I-type instruction!");
         }

@@ -106,6 +106,36 @@ TEST_CASE(lw_negative_offset, {
     REQUIRE_EQUALS(emulator.get_register(Register::ARG5), 0x0decaf00u);
 });
 
+TEST_CASE(lwu_negative_offset, {
+    Assembly assembly{R"TEXT(
+    addi fp, zero, 0x100
+    lwu	a5,-20(fp)
+    )TEXT"};
+
+    Emulator emulator(0, assembly.bytes());
+    emulator.get_memory_mut().store32(0x100 - 20, 0x0decaf00);
+
+    emulator.step();
+    REQUIRE_EQUALS(emulator.get_register(Register::FP), 0x100u);
+    emulator.step();
+    REQUIRE_EQUALS(emulator.get_register(Register::ARG5), 0x0decaf00u);
+});
+
+TEST_CASE(ld_negative_offset, {
+    Assembly assembly{R"TEXT(
+    addi fp, zero, 0x100
+    ld	a5,-20(fp)
+    )TEXT"};
+
+    Emulator emulator(0, assembly.bytes());
+    emulator.get_memory_mut().store64(0x100 - 20, 0x0decaf00);
+
+    emulator.step();
+    REQUIRE_EQUALS(emulator.get_register(Register::FP), 0x100u);
+    emulator.step();
+    REQUIRE_EQUALS(emulator.get_register(Register::ARG5), 0x0decaf00u);
+});
+
 TEST_CASE(sw_negative_offset, {
     Assembly assembly{R"TEXT(
     addi fp, zero, 0x100
