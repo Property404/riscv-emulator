@@ -7,6 +7,7 @@ import <stdexcept>;
 import <variant>;
 import <map>;
 import <cassert>;
+import <sstream>;
 import <functional>;
 
 import memory;
@@ -36,6 +37,8 @@ export namespace Register {
     const size_t T6 = 31;
 };
 
+struct DebugInfo;
+
 class Emulator {
     using ECall = std::function<void(Emulator&)>;
     RegType registers[32] {0};
@@ -43,6 +46,14 @@ class Emulator {
     bool exited = false;
     size_t ip = 0;
     std::map<RegType, ECall> ecalls{};
+
+    template<typename T>
+    void bad_instruction(std::string str, T instruction) const {
+        uint32_t instruction_raw = std::bit_cast<uint32_t>(instruction);
+        std::stringstream ss;
+        ss << str << ": @" <<std::hex << this-> ip - 4 << ": 0x" << instruction_raw;
+        throw std::runtime_error(ss.str());
+    }
 
     void execute_i_type(const Instruction::ITypeInstruction instr) {
         const auto rs1 = this->get_register_signed(instr.rs1);
@@ -75,7 +86,7 @@ class Emulator {
                 // SLTIU
                 rd = rs1_unsigned < instr.zext_imm();
             } else {
-                throw std::runtime_error("Unknown I-type instruction!");
+                this->bad_instruction("Unknown I-type instruction!", instr);
             }
         } else if (instr.opcode == 0b0011011u) {
             if (instr.funct3 == 0x00u) {
@@ -86,7 +97,7 @@ class Emulator {
                 // SLLIW
                 rd = (rs1_unsigned & 0xFFFF'FFFF) << (instr.imm & 0x3F);
             } else {
-                throw std::runtime_error("Unknown I-type instruction!");
+                this->bad_instruction("Unknown I-type instruction!", instr);
             }
         } else if (instr.opcode == 0b000011) {
             if (instr.funct3 == 0x02u) {
@@ -102,7 +113,7 @@ class Emulator {
                 // LWU
                 rd = this->memory.load32(rs1 + instr.sext_imm());
             } else {
-                throw std::runtime_error("Unknown I-type load instruction: " + std::to_string(instr.funct3));
+                this->bad_instruction("Unknown I-type load instruction!", instr);
             }
         } else if (instr.opcode == 0b1110011 && instr.imm == 0) {
             // ECALL
@@ -144,7 +155,7 @@ class Emulator {
                 // SLTU
                 rd = rs1_unsigned < rs2_unsigned;
             } else {
-                throw std::runtime_error("Unknown R-type instruction!");
+                this->bad_instruction("Unknown R-type instruction!", instr);
             }
         } else if(instr.opcode == 0b0111011) {
             if (instr.funct3 == 0x0u && instr.funct7 == 0b0100000) {
@@ -155,8 +166,12 @@ class Emulator {
                 // SRLW TODO: do this conversion properly
                 rd = static_cast<int32_t>(rs1 & 0xFFFF'FFFF) >>
                     static_cast<int32_t>(rs2 & 0xFFFF'FFFF);
+            } else if (instr.funct3 == 0x6u && instr.funct7 == 0b0000001) {
+                // REMW
+                rd = static_cast<uint32_t>(rs1 & 0xFFFF'FFFF) %
+                    static_cast<uint32_t>(rs2 & 0xFFFF'FFFF);
             } else {
-                throw std::runtime_error("Unknown R-type instruction(W)!");
+                this->bad_instruction("Unknown R-type instruction(W)!", instr);
             }
         } else {
                 throw std::runtime_error("Unknown R-type opcode! " + std::to_string(instr.opcode));
