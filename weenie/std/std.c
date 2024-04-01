@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stddef.h>
+#include <assert.h>
 
 [[noreturn]] extern void _exit(int);
 extern long write(int, const char*, int);
@@ -11,15 +12,15 @@ void exit(int code) {
 }
 
 
-static void nullcheck(const void* ptr) {
-    if (ptr == NULL) {
-        puts("NULL pointer detected");
+void __assert(bool condition, const char* message) {
+    if (!condition) {
+        puts(message);
         exit(1);
     }
 }
 
 size_t strlen(const char *s) {
-    nullcheck(s);
+    assert(s != NULL);
 
     unsigned count = 0;
     for (count = 0; s[count] != '\0'; count++) { }
@@ -27,7 +28,7 @@ size_t strlen(const char *s) {
 }
 
 int puts(const char* buf) {
-    nullcheck(buf);
+    assert(buf != NULL);
 
     write(1, buf, strlen(buf));
     putchar('\n');
