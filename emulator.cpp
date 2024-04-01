@@ -110,6 +110,8 @@ class Emulator {
     void execute_r_type(Instruction::RTypeInstruction instr) {
         const auto rs1 = this->get_register_signed(instr.rs1);
         const auto rs2 = this->get_register_signed(instr.rs2);
+        const auto rs1_unsigned = this->get_register(instr.rs1);
+        const auto rs2_unsigned = this->get_register(instr.rs2);
         auto& rd = this->registers[instr.rd];
 
         if (instr.opcode == 0b0110011u) {
@@ -128,6 +130,9 @@ class Emulator {
             } else if (instr.funct3 == 0x7u && instr.funct7 == 0x00) {
                 // AND
                 rd = rs2 & rs1;
+            } else if (instr.funct3 == 0x3u && instr.funct7 == 0x00) {
+                // SLTU
+                rd = rs1_unsigned < rs2_unsigned;
             } else {
                 throw std::runtime_error("Unknown R-type instruction!");
             }

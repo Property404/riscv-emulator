@@ -209,3 +209,23 @@ TEST_CASE(subw, {
     REQUIRE_EQUALS(emulator.get_register(Register::T1), 0x5u);
     REQUIRE_EQUALS(emulator.get_register(Register::T2), 0xa0u);
 });
+
+TEST_CASE(sltu, {
+    Assembly assembly{R"TEXT(
+    addi t0, zero, 0xa5
+    addi t1, zero, 0xa6
+    sltu t2, t0, t1
+    sltu t3, t1, t0
+    sltu t4, t1, t1
+    )TEXT"};
+
+    Emulator emulator(0, assembly.bytes());
+    emulator.step();
+    emulator.step();
+    emulator.step();
+    emulator.step();
+    emulator.step();
+    REQUIRE_EQUALS(emulator.get_register(Register::T2), 1u);
+    REQUIRE_EQUALS(emulator.get_register(Register::T3), 0u);
+    REQUIRE_EQUALS(emulator.get_register(Register::T4), 0u);
+});
