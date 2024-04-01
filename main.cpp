@@ -8,6 +8,8 @@ import memory;
 import debug;
 import file_util;
 
+constexpr size_t DEFAULT_LOAD_ADDRESS = 0x1000;
+
 int main(int argc, const char* argv[]) {
     if (argc != 2 && argc != 3 ) {
         std::cerr << "Expected one argument" << std::endl;
@@ -19,8 +21,10 @@ int main(int argc, const char* argv[]) {
         argc--;
         argv++;
     }
+
     const auto binary = FileUtil::get_contents(argv[1]);
-    Emulator emulator(0, std::vector<uint8_t>(binary.cbegin(), binary.cend()));
+    Memory memory(DEFAULT_LOAD_ADDRESS, std::vector<uint8_t>(binary.cbegin(), binary.cend()));
+    Emulator emulator(0x1000, memory);
 
     // Write
     emulator.register_ecall(64,[](const Emulator& emulator) {

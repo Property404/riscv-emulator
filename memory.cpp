@@ -18,6 +18,12 @@ public:
         }
     }
 
+    Memory(size_t load_address, const std::vector<uint8_t>& vec) {
+        for (size_t i=0; i < vec.size(); i++) {
+            this->memory[i+load_address] = vec[i];
+        }
+    }
+
     Memory() {
     }
 
