@@ -1,5 +1,5 @@
 CXX=g++
-CXXFLAGS=-std=c++20 -Wall -Wextra -fmodules-ts 
+CXXFLAGS=-std=c++20 -Wall -Wextra -fmodules-ts -fsanitize=address
 
 COMMON_OBJECTS=test/harness.o memory.o instruction.o emulator.o file_util.o
 OBJECTS=$(COMMON_OBJECTS) debug.o main.o
