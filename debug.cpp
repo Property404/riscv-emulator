@@ -35,6 +35,9 @@ export void interactive_debug(Emulator& emulator) {
                 break;
             } else if (args.at(0) == "c") {
                 do{
+                    if (emulator.has_exited()) {
+                        break;
+                    }
                     emulator.step();
                 }while(! breaks.contains(emulator.get_ip()));
                 break;

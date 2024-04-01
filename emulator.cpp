@@ -133,7 +133,10 @@ class Emulator {
         const auto rs1 = this->get_register_signed(instr.rs1);
         const auto rs2 = this->get_register(instr.rs2);
 
-        if (instr.funct3 == 0x2u) {
+        if (instr.funct3 == 0x0u) {
+            // SB
+            this->memory.store8(rs1+instr.sext_imm(), rs2);
+        } else if (instr.funct3 == 0x2u) {
             // SW
             this->memory.store32(rs1+instr.sext_imm(), rs2);
         } else if (instr.funct3 == 0x3u) {
@@ -264,6 +267,10 @@ class Emulator {
         } else {
             throw std::runtime_error("Unhandled instruction type");
         }
+    }
+
+    bool has_exited() const {
+        return this->exited;
     }
 
     void exit() {
