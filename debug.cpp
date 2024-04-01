@@ -30,7 +30,7 @@ export void interactive_debug(Emulator& emulator) {
             cout << ">>>";
             std::getline(cin, input);
             const auto args = split_string(input);
-            if (args.size() == 0 || args.at(0) == "s") {
+            if (args.size() == 0 || args.at(0) == "s" || args.at(0) == "si") {
                 emulator.step();
                 break;
             } else if (args.at(0) == "c") {
