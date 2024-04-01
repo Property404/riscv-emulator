@@ -8,7 +8,7 @@ MODULES=iostream map vector cstdint cstddef cstdlib variant string functional \
 		typeinfo new stdexcept fstream filesystem string_view optional random \
 		limits cassert ranges set unordered_set unordered_map sstream
 
-all: gcm.cache/mark $(OBJECTS) 
+all: gcm.cache/mark $(OBJECTS) weenie
 	$(CXX) $(CXXFLAGS) $(OBJECTS)
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) -c $(@:.o=.cpp) -o $@
@@ -17,11 +17,15 @@ unittest: $(TEST_OBJECTS)
 .PHONY: test
 test: gcm.cache/mark unittest
 	./unittest
+.PHONY: weenie
+weenie:
+	$(MAKE) -C weenie
 gcm.cache/mark:
 	$(foreach module,$(MODULES),$(CXX) $(CXXFLAGS) -x c++-system-header $(module);)
 	touch gcm.cache/mark
 refresh:
 	rm gcm.cache/mark
 clean:
+	$(MAKE) -C weenie clean
 	rm -rf gcm.cache
 	find . -name '*.o' -exec rm {} \;

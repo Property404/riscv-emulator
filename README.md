@@ -4,8 +4,6 @@
 
 ```
 make
-cd weenie && make && cd ..
-
 ./a.out weenie/weenie.bin
 ```
 
