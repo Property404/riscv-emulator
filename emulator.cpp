@@ -172,6 +172,11 @@ class Emulator {
             if (rs1 != rs2) {
                 this->ip += instr.sext_imm() - 4;
             }
+        } else if (instr.funct3 == 0x5) {
+            // BGE
+            if (rs1 >= rs2) {
+                this->ip += instr.sext_imm() - 4;
+            }
         } else {
             throw std::runtime_error("Unknown B-type instruction!");
         }
