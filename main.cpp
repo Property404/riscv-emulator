@@ -42,6 +42,21 @@ int main(int argc, const char* argv[]) {
             }
     });
 
+    // READ
+    emulator.register_ecall(63,[](Emulator& emulator) {
+            const auto fd = emulator.get_register(Register::ARG0);
+            const auto buf = emulator.get_register(Register::ARG1);
+            const auto count = emulator.get_register(Register::ARG2);
+
+            if (fd != 0) {
+                throw std::runtime_error("read() only supports stdin");
+            }
+
+            for (unsigned i=0; i < count; i++) {
+                emulator.get_memory_mut().store8(buf+i, std::getchar());
+            }
+    });
+
     // Exit
     emulator.register_ecall(93,[](Emulator& emulator) {
             std::cout<<" Exiting emulator" << std::endl;

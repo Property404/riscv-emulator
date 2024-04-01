@@ -5,7 +5,8 @@
 #include <assert.h>
 
 [[noreturn]] extern void _exit(int);
-extern long write(int, const char*, int);
+extern long write(int, const char*, size_t);
+extern long read(int, char*, size_t);
 
 void exit(int code) {
     _exit(code);
@@ -59,6 +60,12 @@ int putchar(int c) {
     return 0;
 }
 
+int getchar() {
+    char c;
+    read(0, &c, 1);
+    return c;
+}
+
 __asm__(".globl _exit\n\t"
         ".type _exit, @function\n\t"
         "_exit:\n\t"
@@ -73,6 +80,15 @@ __asm__(".globl _write\n\t"
         "write:\n\t"
         ".cfi_startproc\n\t"
         "addi a7, x0, 64\n\t"
+        "ecall\n\t"
+        "ret\n\t"
+        ".cfi_endproc");
+
+__asm__(".globl _read\n\t"
+        ".type _read, @function\n\t"
+        "read:\n\t"
+        ".cfi_startproc\n\t"
+        "addi a7, x0, 63\n\t"
         "ecall\n\t"
         "ret\n\t"
         ".cfi_endproc");
