@@ -1,3 +1,4 @@
 !*.ld
 !*.S
 !Makefile
+!*.c
