@@ -3,8 +3,8 @@ CC=$(TRIPLE)gcc
 LD=$(TRIPLE)ld
 AS=$(TRIPLE)as
 OBJCOPY=$(TRIPLE)objcopy
-CCFLAGS=-march=rv64i -mabi="lp64" -Wall -Wextra -O0 -ffreestanding -Istd
-ASFLAGS=-march=rv64i -mabi="lp64"
+CCFLAGS=-march=rv64im -mabi="lp64" -Wall -Wextra -O0 -ffreestanding -Istd
+ASFLAGS=-march=rv64im -mabi="lp64"
 LDFLAGS=-T linker.ld
 
 EXECUTABLE=weenie
