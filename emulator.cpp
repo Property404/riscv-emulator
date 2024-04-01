@@ -33,6 +33,7 @@ class Emulator {
     using ECall = std::function<void(Emulator&)>;
     RegType registers[32] {0};
     Memory memory;
+    bool exited = false;
     size_t ip = 0;
     std::map<RegType, ECall> ecalls{};
 
@@ -241,6 +242,10 @@ class Emulator {
     }
 
     void step() {
+        if (this->exited) {
+            throw std::runtime_error("Stepped after program exit");
+        }
+
         const auto next_instruction = Instruction::parse(memory.load32(this->ip));
         this->ip += 4;
 
@@ -261,8 +266,12 @@ class Emulator {
         }
     }
 
+    void exit() {
+        this->exited = true;
+    }
+
     void run() {
-        while(true) {
+        while(! this->exited) {
             step();
         }
     }

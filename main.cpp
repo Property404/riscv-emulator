@@ -36,9 +36,9 @@ int main(int argc, const char* argv[]) {
     });
 
     // Exit
-    emulator.register_ecall(93,[](const Emulator& emulator) {
+    emulator.register_ecall(93,[](Emulator& emulator) {
             std::cout<<" Exiting emulator" << std::endl;
-            std::exit(emulator.get_register(Register::ARG0));
+            emulator.exit();
     });
 
     if (debug) {
