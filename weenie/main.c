@@ -21,7 +21,8 @@ void puthexdigit(uint8_t val) {
 }
 
 void puthex(uint32_t val) {
-    puts("0x");
+    putchar('0');
+    putchar('x');
     for (int i=0;i<32;i+=4) {
         puthexdigit(((val >> (24 - i))&0xFF));
     }
@@ -30,7 +31,6 @@ void puthex(uint32_t val) {
 int main() {
     for (int i=0; i<4; i++) {
         puthex(i);
-        puts("Hello, world!\n");
-        putchar('\n');
+        puts(": Hello, world!");
     }
 }
