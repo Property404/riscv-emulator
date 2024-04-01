@@ -8,7 +8,7 @@ ASFLAGS=-march=rv64i -mabi="lp64"
 LDFLAGS=-T linker.ld
 
 EXECUTABLE=weenie
-OBJECTS=start.o main.o std/std.o
+OBJECTS=start.o main.o std/std.o std/printf.o
 
 all: $(OBJECTS) 
 	$(LD) $(LDFLAGS) $(OBJECTS) -o $(EXECUTABLE).elf

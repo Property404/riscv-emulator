@@ -19,6 +19,24 @@ void __assert(bool condition, const char* message) {
     }
 }
 
+int strncmp(const char* s1, const char* s2, size_t n) {
+    assert(s1 != NULL);
+    assert(s2 != NULL);
+    for(unsigned i=0; i< n;i++){
+        if (s1[i] != s2[i]) {
+            if (s1[i] < s2[i]) {
+                return -1;
+            } else {
+                return +1;
+            }
+        }
+        if (s1[i] == '\0' || s2[i] == '\0') {
+            return 0;
+        }
+    }
+    return 0;
+}
+
 size_t strlen(const char *s) {
     assert(s != NULL);
 
