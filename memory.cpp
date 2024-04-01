@@ -64,7 +64,7 @@ public:
     }
 
     void store32(size_t dest, uint32_t val) {
-        std::cout << "Storing at " << std::hex << dest <<std::endl;
+        //std::cout << "Storing at " << std::hex << dest <<std::endl;
         memory[dest + 0] = (val >> 0) & 0xFF;
         memory[dest + 1] = (val >> 8) & 0xFF;
         memory[dest + 2] = (val >> 16) & 0xFF;
@@ -72,7 +72,7 @@ public:
     }
 
     void store64(size_t dest, uint64_t val) {
-        std::cout << "Storing at " << std::hex << dest <<std::endl;
+        //std::cout << "Storing at " << std::hex << dest <<std::endl;
         memory[dest + 0] = (val >> 0) & 0xFF;
         memory[dest + 1] = (val >> 8) & 0xFF;
         memory[dest + 2] = (val >> 16) & 0xFF;

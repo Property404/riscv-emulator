@@ -13,5 +13,7 @@ int puts(const char* buf) {
 }
 
 int main() {
-    puts("Hello, world!\n");
+    for (int i=0; i<4; i++) {
+        puts("Hello, world!\n");
+    }
 }

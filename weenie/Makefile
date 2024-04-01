@@ -3,7 +3,7 @@ CC=$(TRIPLE)gcc
 LD=$(TRIPLE)ld
 AS=$(TRIPLE)as
 OBJCOPY=$(TRIPLE)objcopy
-CCFLAGS=-march=rv64i -mabi="lp64" -O0
+CCFLAGS=-march=rv64i -mabi="lp64" -O0 -ffreestanding
 ASFLAGS=-march=rv64i -mabi="lp64"
 LDFLAGS=-T linker.ld
 
