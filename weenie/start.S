@@ -1,6 +1,7 @@
 .option norvc
 .global _start
 .global sys_write
+.global sys_exit
 .section .rodata
 hello: .ascii "Hello World!\n"
 .section .text
@@ -18,5 +19,9 @@ ecall
 
 sys_write:
     addi a7, x0, 64
+    ecall
+    ret
+sys_exit:
+    addi a7, x0, 93
     ecall
     ret
