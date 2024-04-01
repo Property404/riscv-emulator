@@ -119,7 +119,7 @@ namespace Instruction {
 
     export std::variant<JTypeInstruction,BTypeInstruction, RTypeInstruction, ITypeInstruction, STypeInstruction, UTypeInstruction> parse(uint32_t word) {
         const auto opcode = word & 0b0111'1111;
-        if (opcode == 0b0110011)  {
+        if (opcode == 0b0110011 || opcode == 0b0111011)  {
             return std::bit_cast<RTypeInstruction>(word);
         } else if(opcode == 0b0010011 || opcode == 0b0000011 || opcode == 0b1110011 || opcode == 0b0011011 || opcode == 0b1100111) {
             return std::bit_cast<ITypeInstruction>(word);

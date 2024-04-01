@@ -101,29 +101,43 @@ class Emulator {
     }
 
     void execute_r_type(Instruction::RTypeInstruction instr) {
-        assert(instr.opcode == 0b0110011u);
-
         const auto rs1 = this->get_register_signed(instr.rs1);
         const auto rs2 = this->get_register_signed(instr.rs2);
         auto& rd = this->registers[instr.rd];
 
-        if (instr.funct3 == 0x0u && instr.funct7 == 0x00) {
-            // ADD
-            rd = rs2 + rs1;
-        } else if (instr.funct3 == 0x0u && instr.funct7 == 0x20) {
-            // SUB
-            rd = rs2 - rs1;
-        } else if (instr.funct3 == 0x4u && instr.funct7 == 0x00) {
-            // XOR
-            rd = rs2 ^ rs1;
-        } else if (instr.funct3 == 0x6u && instr.funct7 == 0x00) {
-            // OR
-            rd = rs2 | rs1;
-        } else if (instr.funct3 == 0x7u && instr.funct7 == 0x00) {
-            // OR
-            rd = rs2 & rs1;
+        if (instr.opcode == 0b0110011u) {
+            if (instr.funct3 == 0x0u && instr.funct7 == 0x00) {
+                // ADD
+                rd = rs2 + rs1;
+            } else if (instr.funct3 == 0x0u && instr.funct7 == 0x20) {
+                // SUB
+                rd = rs2 - rs1;
+            } else if (instr.funct3 == 0x4u && instr.funct7 == 0x00) {
+                // XOR
+                rd = rs2 ^ rs1;
+            } else if (instr.funct3 == 0x6u && instr.funct7 == 0x00) {
+                // OR
+                rd = rs2 | rs1;
+            } else if (instr.funct3 == 0x7u && instr.funct7 == 0x00) {
+                // OR
+                rd = rs2 & rs1;
+            } else {
+                throw std::runtime_error("Unknown R-type instruction!");
+            }
+        } else if(instr.opcode == 0b0111011) {
+            if (instr.funct3 == 0x0u && instr.funct7 == 0b0100000) {
+                // SUBW TODO: do this conversion properly
+                rd = static_cast<int32_t>(rs2 & 0xFFFF'FFFF) -
+                    static_cast<int32_t>(rs1 & 0xFFFF'FFFF);
+            } else if (instr.funct3 == 0x5u && instr.funct7 == 0b0000000) {
+                // SRLW TODO: do this conversion properly
+                rd = static_cast<int32_t>(rs2 & 0xFFFF'FFFF) >>
+                    static_cast<int32_t>(rs1 & 0xFFFF'FFFF);
+            } else {
+                throw std::runtime_error("Unknown R-type instruction(W)!");
+            }
         } else {
-            throw std::runtime_error("Unknown R-type instruction!");
+                throw std::runtime_error("Unknown R-type opcode! " + std::to_string(instr.opcode));
         }
     }
 
@@ -174,6 +188,11 @@ class Emulator {
         } else if (instr.funct3 == 0x1) {
             // BNE
             if (rs1 != rs2) {
+                this->ip += instr.sext_imm() - 4;
+            }
+        } else if (instr.funct3 == 0x6) {
+            // BLTU
+            if (rs1 < rs2) {
                 this->ip += instr.sext_imm() - 4;
             }
         } else if (instr.funct3 == 0x5) {
