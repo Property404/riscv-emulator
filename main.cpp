@@ -2,6 +2,7 @@ import <vector>;
 import <cstdint>;
 import <string>;
 import <typeinfo>;
+import <stdexcept>;
 import <iostream>;
 import emulator;
 import memory;
@@ -31,12 +32,14 @@ int main(int argc, const char* argv[]) {
             const auto fd = emulator.get_register(Register::ARG0);
             const auto buf = emulator.get_register(Register::ARG1);
             const auto count = emulator.get_register(Register::ARG2);
-            std::cout<<"Write syscall: "<< fd <<" " << buf << " " << count << std::endl;
+
+            if (fd != 1) {
+                throw std::runtime_error("write() only supports stdout");
+            }
 
             for (unsigned i=0; i < count; i++) {
                 std::cout << emulator.get_memory().load8(buf + i);
             }
-            std::cout << std::endl;
     });
 
     // Exit
