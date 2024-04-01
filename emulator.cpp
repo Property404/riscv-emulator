@@ -46,6 +46,7 @@ class Emulator {
 
     void execute_i_type(const Instruction::ITypeInstruction instr) {
         const auto rs1 = this->get_register_signed(instr.rs1);
+        const auto rs1_unsigned = this->get_register(instr.rs1);
         auto& rd = this->registers[instr.rd];
 
         if (instr.opcode == 0b0010011u) {
@@ -67,6 +68,12 @@ class Emulator {
             } else if (instr.funct3 == 0x05u && ((instr.imm >> 6) == 0x00)) {
                 // SRLI
                 rd = rs1 >> (instr.imm & 0x3F);
+            } else if (instr.funct3 == 0x02u) {
+                // SLTI
+                rd = rs1 < instr.sext_imm();
+            } else if (instr.funct3 == 0x03u) {
+                // SLTIU
+                rd = rs1_unsigned < instr.zext_imm();
             } else {
                 throw std::runtime_error("Unknown I-type instruction!");
             }
@@ -75,6 +82,9 @@ class Emulator {
                 // ADDIW
                 rd &= 0xFFFFFFFF'00000000;
                 rd |= (uint32_t)(rs1) + (uint32_t)(instr.sext_imm());
+            } else if (instr.funct3 == 0x01u && ((instr.imm >> 6) == 0x00)) {
+                // SLLIW
+                rd = (rs1_unsigned & 0xFFFF'FFFF) << (instr.imm & 0x3F);
             } else {
                 throw std::runtime_error("Unknown I-type instruction!");
             }
@@ -189,27 +199,39 @@ class Emulator {
 
     void execute_b_type(Instruction::BTypeInstruction instr) {
         assert(instr.opcode == 0b1100011);
-        const auto rs1 = this->get_register(instr.rs1);
-        const auto rs2 = this->get_register(instr.rs2);
+        const auto rs1_signed = this->get_register_signed(instr.rs1);
+        const auto rs2_signed = this->get_register_signed(instr.rs2);
+        const auto rs1_unsigned = this->get_register(instr.rs1);
+        const auto rs2_unsigned = this->get_register(instr.rs2);
 
         if (instr.funct3 == 0x0) {
             // BEQ
-            if (rs1 == rs2) {
+            if (rs1_signed == rs2_signed) {
                 this->ip += instr.sext_imm() - 4;
             }
         } else if (instr.funct3 == 0x1) {
             // BNE
-            if (rs1 != rs2) {
+            if (rs1_signed != rs2_signed) {
+                this->ip += instr.sext_imm() - 4;
+            }
+        } else if (instr.funct3 == 0x4) {
+            // BLT
+            if (rs1_signed < rs2_signed) {
                 this->ip += instr.sext_imm() - 4;
             }
         } else if (instr.funct3 == 0x6) {
             // BLTU
-            if (rs1 < rs2) {
+            if (rs1_unsigned < rs2_unsigned) {
                 this->ip += instr.sext_imm() - 4;
             }
         } else if (instr.funct3 == 0x5) {
             // BGE
-            if (rs1 >= rs2) {
+            if (rs1_signed >= rs2_signed) {
+                this->ip += instr.sext_imm() - 4;
+            }
+        } else if (instr.funct3 == 0x7) {
+            // BGEU
+            if (rs1_unsigned >= rs2_unsigned) {
                 this->ip += instr.sext_imm() - 4;
             }
         } else {

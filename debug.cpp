@@ -25,7 +25,7 @@ export void interactive_debug(Emulator& emulator) {
     std::unordered_set<size_t> breaks;
 
     while (true) {
-        cout<<hex << "0x" << emulator.get_ip() << ": 0x" << emulator.current_instruction() << endl;
+        cout<<hex << "0x" << emulator.get_ip() << ": 0x" << emulator.current_instruction() << "\n";
         while(true) {
             cout << ">>>";
             std::getline(cin, input);
