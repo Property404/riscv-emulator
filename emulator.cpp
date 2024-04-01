@@ -119,7 +119,7 @@ class Emulator {
                 // OR
                 rd = rs2 | rs1;
             } else if (instr.funct3 == 0x7u && instr.funct7 == 0x00) {
-                // OR
+                // AND
                 rd = rs2 & rs1;
             } else {
                 throw std::runtime_error("Unknown R-type instruction!");
