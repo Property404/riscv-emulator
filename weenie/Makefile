@@ -3,12 +3,12 @@ CC=$(TRIPLE)gcc
 LD=$(TRIPLE)ld
 AS=$(TRIPLE)as
 OBJCOPY=$(TRIPLE)objcopy
-CCFLAGS=-march=rv64i -mabi="lp64" -O0 -ffreestanding
+CCFLAGS=-march=rv64i -mabi="lp64" -O0 -ffreestanding -Istd
 ASFLAGS=-march=rv64i -mabi="lp64"
 LDFLAGS=-T linker.ld
 
 EXECUTABLE=weenie
-OBJECTS=start.o main.o
+OBJECTS=start.o main.o std/std.o
 
 all: $(OBJECTS) 
 	$(LD) $(LDFLAGS) $(OBJECTS) -o $(EXECUTABLE).elf
